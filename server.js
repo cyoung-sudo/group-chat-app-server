@@ -5,6 +5,8 @@ import "./db/connection.js";
 // Sockets
 import { createServer } from "http";
 import { Server } from "socket.io";
+// Routes
+import userRoutes from "./routes/user.js";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -17,6 +19,9 @@ const io = new Server(server, {
 //----- Middleware
 app.use(cors());
 app.use(express.json());
+
+//----- Routes
+app.use("/api/user", userRoutes);
 
 //----- Socket events
 io.on("connection", socket => {
