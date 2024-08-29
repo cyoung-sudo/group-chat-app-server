@@ -7,6 +7,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 // Routes
 import userRoutes from "./routes/user.js";
+// Models
+import Message from "./models/messageModel.js";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -26,6 +28,34 @@ app.use("/api/user", userRoutes);
 //----- Socket events
 io.on("connection", socket => {
   console.log(`New connection: ${socket.id}`);
+
+  socket.on("join-group", data => {
+    // Join room
+    socket.join(data);
+    // Retrieve group messages
+    Message.find({group: data})
+    .then(docs => {
+      io.sockets.to(data).emit("update-messages", docs);
+    })
+    .catch(err => console.log(err));
+  });
+
+  socket.on("submit-message", data => {
+    Message.create({
+      username: data.username,
+      text: data.text,
+      group: data.group
+    })
+    .then(savedDoc => {
+      // Retrieve all group messages
+      return Message.find({group: data.group});
+    })
+    .then(docs => {
+      // Send updated messages to group
+      io.sockets.to(data.group).emit("update-messages", docs);
+    })
+    .catch(err => console.log(err));
+  });
 });
 
 //----- Server connection
