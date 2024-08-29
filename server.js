@@ -27,8 +27,6 @@ app.use("/api/user", userRoutes);
 
 //----- Socket events
 io.on("connection", socket => {
-  console.log(`New connection: ${socket.id}`);
-
   socket.on("join-group", data => {
     // Join room
     socket.join(data);
