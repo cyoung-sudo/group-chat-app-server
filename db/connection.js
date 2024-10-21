@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+const uri = process.env.ATLAS_URI || "";
 
-mongoose.connect(process.env.ATLAS_URI)
-  .then(() => console.log("Connected to Database"))
-  .catch(err => console.log(err));
+export const connectToDatabase = () => {
+  return mongoose.connect(uri);
+};
